@@ -54,7 +54,7 @@ As part of my deep dive into cryptography and secure computing, I implemented th
 ## Results
 Successfully Implemented:
 1. **Secure encryption techniques (AES / AES-CTR mode)**
-2. **Pseudo-random number generation for cryptographic security (ANSI)
+2. **Pseudo-random number generation for cryptographic security (ANSI)**
 
 **Generated Random Numbers**:
   - 331374527193731622526773163027689011175
