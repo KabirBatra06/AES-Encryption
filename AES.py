@@ -247,6 +247,99 @@ class AES():
                 fout.write(retval)
         fout.close()
 
+    def ctr_aes_image(self , iv , image_file , enc_image):
+        bv = BitVector(size = 0)
+        bvh = BitVector(size = 0)
+
+        fin = open(image_file, "rb")
+        lines = fin.readlines()
+        fin.close()
+
+        for i in range(3):
+            bvh += BitVector(rawbytes = lines[i])
+
+        for i in range(3, len(lines)):
+            bv += BitVector(rawbytes = lines[i])
+
+        temp_file = open('temp.bin', 'wb')
+        bv.write_to_file(temp_file)
+        temp_file.close()
+        bv = BitVector(filename = 'temp.bin')
+        os.remove("temp.bin")
+
+        fout = open(enc_image, "wb")
+        bvh.write_to_file(fout)
+
+        while (bv.more_to_read):
+            bitvec = iv 
+
+            if bitvec._getsize() > 0 and bitvec._getsize() < 128:
+                bitvec.pad_from_right(128 - bitvec._getsize())
+    
+            p_text = bv.read_bits_from_file(128)
+            if p_text._getsize() > 0 and p_text._getsize() < 128:
+                p_text.pad_from_right(128 - p_text._getsize())
+
+            if p_text._getsize() > 0:                
+                # XOR-ing First 4 words
+                bitvec = bitvec ^ (self.key_schedule[0] + self.key_schedule[1] + self.key_schedule[2] + self.key_schedule[3])
+
+                # Making State Table
+                statearray = self.make_state_table(bitvec)
+
+                for round in range(14):
+                    
+                    # Sub bytes
+                    self.subbytes(statearray)
+
+                    # Shift rows
+                    self.shift_rows(statearray)
+
+                    # Mix Cols
+                    if round != 13:
+                        statearray = self.mix_columns(statearray)
+
+                    # add key
+                    statearray = self.add_key(statearray, round)
+                
+                retval = BitVector(size=0)
+                for i in range(4):
+                    for j in range(4):
+                        retval += statearray[j][i]
+
+                retval ^= p_text
+                retval.write_to_file(fout)
+                iv = BitVector(intVal=((iv.intValue() + 1) % (2**128)), size=128)
+
+        fout.close()
+
+    def rng_helper(self, bitvec):
+        if bitvec._getsize() > 0:
+            bitvec = bitvec ^ (self.key_schedule[0] + self.key_schedule[1] + self.key_schedule[2] + self.key_schedule[3])
+            statearray = self.make_state_table(bitvec)
+
+            for round in range(14):
+                self.subbytes(statearray)
+                self.shift_rows(statearray)
+                if round != 13:
+                    statearray = self.mix_columns(statearray)
+                statearray = self.add_key(statearray, round)
+            retval = BitVector(size=0)
+            for i in range(4):
+                for j in range(4):
+                    retval += statearray[j][i]
+        return retval
+    
+    def x931(self , v0 , dt , totalNum , outfile):
+        fout = open(outfile, "w")
+        v = v0
+        for i in range(totalNum):
+            I = self.rng_helper(dt)
+            R = self.rng_helper(I^v)
+            v = self.rng_helper(R ^ I)
+            fout.write(str(R.intValue()))
+            fout.write("\n")
+
 if __name__ == "__main__":
 
     cipher = AES(keyfile = sys.argv[3])
@@ -257,5 +350,7 @@ if __name__ == "__main__":
         cipher.encrypt(plaintext=sys.argv[2], ciphertext=sys.argv[4])
     elif sys.argv[1] == "-d":
         cipher.decrypt(ciphertext=sys.argv[2], decrypted=sys.argv[4])
+    elif sys.argv[1] == "-i":
+        cipher.ctr_aes_image(iv= BitVector(textstring="counter-mode-ctr"), image_file=sys.argv[2], enc_image=sys.argv[4])
     else:
-        sys.exit("Incorrect Command -Line Syntax")
+        cipher.x931(v0=BitVector(textstring="counter-mode-ctr"), dt=BitVector(intVal=501 ,size=128), totalNum=int(sys.argv[2]), outfile=sys.argv[4])
