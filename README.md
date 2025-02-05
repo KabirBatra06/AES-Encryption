@@ -2,7 +2,7 @@
 
 As part of my deep dive into cryptography and secure computing, I implemented the **Advanced Encryption Standard (AES-256)** algorithm in Python. This project focuses on encrypting and decrypting messages using a **256-bit key**, adhering to the AES encryption standard.
 
-## Implementatin details for Plaintext Encryption:
+## Implementation details for Plaintext Encryption:
 - **Object-Oriented Python Implementation**: Designed an `AES` class that efficiently performs encryption and decryption operations.
 - **Key Expansion for 256-bit Key**: Implemented a key schedule to handle the 256-bit key, ensuring correct generation of round keys.
 - **Encryption Pipeline**:
@@ -20,7 +20,7 @@ As part of my deep dive into cryptography and secure computing, I implemented th
 - **Padding Handling**:
   - Managed cases where plaintext length isn’t a multiple of the block size by applying padding.
 
-## Implementatin details for Image Encryption using Counter Mode:
+## Implementation details for Image Encryption using Counter Mode:
 - **Modified AES Class**:
   - Added a new method: `ctr_aes_image(self, iv, image_file, enc_image)`.
   - Utilized **AES in CTR mode** to encrypt an image file (`.ppm` format).
@@ -36,7 +36,7 @@ As part of my deep dive into cryptography and secure computing, I implemented th
 - **Security Enhancements**:
   - Unlike ECB mode, **CTR mode prevents patterns from being visible in encrypted images**, ensuring greater confidentiality.
 
-## Implementatin details for **ANSI X9.31 Cryptographically Secure PRNG (CSPRNG)**
+## Implementation details for **ANSI X9.31 Cryptographically Secure PRNG (CSPRNG)**
 
 - **Modified AES Class**:
   - Added a new method: `x931(self, v0, dt, totalNum, outfile)`.
