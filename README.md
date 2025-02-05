@@ -66,11 +66,11 @@ Successfully Implemented:
 **Plain Image**
 
 
-<img src="https://github.com/KabirBatra06/Homography_Estimation/blob/main/img1.jpg" width="350" title="Frame A">
+<img src="https://github.com/KabirBatra06/AES-Encryption/blob/main/image.jpg" width="500" title="Frame A">
 
 **Encrypted Image** 
 
 
-<img src="https://github.com/KabirBatra06/Homography_Estimation/blob/main/img1.jpg" width="350" title="Frame A">
+<img src="https://github.com/KabirBatra06/AES-Encryption/blob/main/enc_image.jpg" width="500" title="Frame A">
 
 
